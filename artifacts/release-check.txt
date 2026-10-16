@@ -1,0 +1,160 @@
+
+added 92 packages in 1s
+
+29 packages are looking for funding
+  run `npm fund` for details
+
+> midnight-mafia@2.0.0 test
+> node --test tests/*.test.js
+
+TAP version 13
+# (node:1937) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: role names and plurality
+ok 1 - role names and plurality
+  ---
+  duration_ms: 1.490478
+  type: 'test'
+  ...
+# Subtest: 5–12 players: exactly one of every special role, minimum five
+ok 2 - 5–12 players: exactly one of every special role, minimum five
+  ---
+  duration_ms: 4.192802
+  type: 'test'
+  ...
+# Subtest: readiness, capacity and duplicate names enforced
+ok 3 - readiness, capacity and duplicate names enforced
+  ---
+  duration_ms: 0.369244
+  type: 'test'
+  ...
+# Subtest: first night identity goes only to traitor, only after reveal
+ok 4 - first night identity goes only to traitor, only after reveal
+  ---
+  duration_ms: 0.937812
+  type: 'test'
+  ...
+# Subtest: first night: no attack/protection, then detective only; result arrives in morning
+ok 5 - first night: no attack/protection, then detective only; result arrives in morning
+  ---
+  duration_ms: 0.717086
+  type: 'test'
+  ...
+# Subtest: traitor investigation is not mafia
+ok 6 - traitor investigation is not mafia
+  ---
+  duration_ms: 0.33324
+  type: 'test'
+  ...
+# Subtest: every day is exactly 300 seconds even if internal setting modified
+ok 7 - every day is exactly 300 seconds even if internal setting modified
+  ---
+  duration_ms: 0.770992
+  type: 'test'
+  ...
+# Subtest: real timer scheduling: 299999ms stays day, 300000ms starts vote
+ok 8 - real timer scheduling: 299999ms stays day, 300000ms starts vote
+  ---
+  duration_ms: 0.826099
+  type: 'test'
+  ...
+# Subtest: second night strictly mafia → doctor → detective; protection resolves after all
+ok 9 - second night strictly mafia → doctor → detective; protection resolves after all
+  ---
+  duration_ms: 0.605972
+  type: 'test'
+  ...
+# Subtest: unprotected kill after detective, including investigator attacked that night
+ok 10 - unprotected kill after detective, including investigator attacked that night
+  ---
+  duration_ms: 1.33466
+  type: 'test'
+  ...
+# Subtest: third night repeats same sequence, no reset to second day
+ok 11 - third night repeats same sequence, no reset to second day
+  ---
+  duration_ms: 0.337341
+  type: 'test'
+  ...
+# Subtest: eliminated role still receives fixed slot without an action
+ok 12 - eliminated role still receives fixed slot without an action
+  ---
+  duration_ms: 0.32744
+  type: 'test'
+  ...
+# Subtest: illegal/duplicate/self night and dead actions rejected; doctor may self protect
+ok 13 - illegal/duplicate/self night and dead actions rejected; doctor may self protect
+  ---
+  duration_ms: 0.42065
+  type: 'test'
+  ...
+# Subtest: tied vote limits next candidates; all living may revote, including self
+ok 14 - tied vote limits next candidates; all living may revote, including self
+  ---
+  duration_ms: 0.520863
+  type: 'test'
+  ...
+# Subtest: repeated ties and empty ballots never eliminate arbitrarily; no abstention
+ok 15 - repeated ties and empty ballots never eliminate arbitrarily; no abstention
+  ---
+  duration_ms: 0.341141
+  type: 'test'
+  ...
+# Subtest: all living votes resolve early; identifying mafia wins immediately and reset clears secrets
+ok 16 - all living votes resolve early; identifying mafia wins immediately and reset clears secrets
+  ---
+  duration_ms: 0.408549
+  type: 'test'
+  ...
+# Subtest: wrongly identifying citizen triggers parity victory at five players
+ok 17 - wrongly identifying citizen triggers parity victory at five players
+  ---
+  duration_ms: 0.216626
+  type: 'test'
+  ...
+# Subtest: wrongly identifying traitor eliminates it and continues without parity win
+ok 18 - wrongly identifying traitor eliminates it and continues without parity win
+  ---
+  duration_ms: 0.209125
+  type: 'test'
+  ...
+# Subtest: parity counts living traitor, excludes eliminated allies; greater-than also wins
+ok 19 - parity counts living traitor, excludes eliminated allies; greater-than also wins
+  ---
+  duration_ms: 0.313638
+  type: 'test'
+  ...
+# Subtest: night casualty triggers parity immediately; mafia elimination takes priority
+ok 20 - night casualty triggers parity immediately; mafia elimination takes priority
+  ---
+  duration_ms: 0.58157
+  type: 'test'
+  ...
+# Subtest: all non-system messages discarded even for eliminated players
+ok 21 - all non-system messages discarded even for eliminated players
+  ---
+  duration_ms: 0.318138
+  type: 'test'
+  ...
+# Subtest: 100 bot games terminate with valid roles, winners and timer cleanup
+ok 22 - 100 bot games terminate with valid roles, winners and timer cleanup
+  ---
+  duration_ms: 32.355371
+  type: 'test'
+  ...
+# PASS: six clients, traitor-only identity, first-night restrictions, sequential attack/protect/investigate, revote restriction, dead actions, all-phase chat rejection, fixed five-minute discussion, reconnect and separate room.
+# Subtest: six real clients: secrets, all chat blocked, fixed discussion, sequential actions, ties, reconnect and room isolation
+ok 23 - six real clients: secrets, all chat blocked, fixed discussion, sequential actions, ties, reconnect and room isolation
+  ---
+  duration_ms: 284.337519
+  type: 'test'
+  ...
+1..23
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 469.034516

@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "date": "2026-10-16",
+  "nodeVerified": "22.23.2",
+  "automatedTests": 23,
+  "botSimulations": 100,
+  "browserParticipants": 6,
+  "discussionSeconds": 300,
+  "discussionTimerVerification": "Node mock clock; browser phase transitions manually accelerated after real 8-second reveal",
+  "publiclyDeployed": false,
+  "extractedArchiveInstallAndTests": "PASS: npm ci --offline --no-audit --ignore-scripts; 23 tests"
+}

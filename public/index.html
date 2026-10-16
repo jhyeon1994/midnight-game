@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111217">
+<meta name="description" content="친구와 함께하는 실시간 밀정 게임. 초대 코드 하나로 시작되는 한밤의 추리.">
+<title>MIDNIGHT — 이 밤, 누구를 믿으시겠어요?</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="stylesheet" href="/style.css">
+<script src="/socket.io/socket.io.js" defer></script><script src="/app.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="top-inner"><a class="brand" href="/" aria-label="미드나잇 홈"><svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><path d="M18 2 33 10v15L18 34 3 25V10Z" stroke="currentColor" stroke-width="1.5"/><path d="m8 15 10 3 10-3-2 8-8 5-8-5Z" fill="currentColor"/><path d="m11 19 5 2m4 0 5-2" stroke="#111217" stroke-width="2"/></svg><span>MIDNIGHT<small>밀정 소셜 클럽</small></span></a><nav><span id="connection" class="connection"><i></i> 연결 중</span><button class="quiet" id="rules-button">게임 가이드 <span>↗</span></button></nav></div></header>
+<main id="app"><div class="loading">도시에 불을 켜는 중…</div></main>
+<footer><span class="footer-mark">M<span>◆</span>N</span><span>친구와 함께, 의심은 가볍게.</span><span class="footer-right">A GAME OF TRUST & DECEPTION</span></footer>
+<div id="toast" role="status" aria-live="polite"></div>
+<dialog id="rules-dialog"><div class="dialog-head"><span class="eyebrow">HOW TO PLAY</span><button class="icon-button close-dialog" aria-label="닫기">×</button></div><h2>낮에는 추리하고,<br>밤에는 살아남으세요.</h2><p class="muted">서버가 사회자가 되어 진행합니다. 5~12명이 함께할 수 있어요. 앱 내 채팅은 없습니다.</p><div class="rule-steps"><article><b>01</b><div><h3>비밀 역할과 첫날 밤</h3><p>밀정·친일파·독립군·한국인 의사를 각 1명, 나머지는 한국인으로 배정합니다. 역할 확인 8초 후 친일파가 밀정을 확인하고, 독립군이 조사합니다. 첫날 밤에는 공격과 보호가 없습니다.</p></div></article><article><b>02</b><div><h3>낮 · 5분 토론과 투표</h3><p>모든 낮의 토론은 5분 고정입니다. 이후 한 명을 밀정으로 지목합니다. 밀정이면 독립군 측 승리, 아니면 지목된 사람이 탈락합니다. 동점이면 동점자만 후보로 재투표하며 모든 생존자가 참여합니다.</p></div></article><article><b>03</b><div><h3>둘째 밤부터 · 순서대로 행동</h3><p>밀정 공격 → 한국인 의사 보호 → 독립군 조사 순서로 반복합니다. 모두 행동한 뒤 보호·탈락을 판정하고 다음 5분 낮 토론으로 이어집니다.</p></div></article></div><div class="guide-note"><b>승리 조건</b><p>독립군 측: 투표로 밀정을 지목하면 승리.<br>밀정 측: 생존 밀정＋친일파 수가 다른 생존자 수 이상이면 자동 승리.</p></div><details><summary>역할 배정 · 세부 규칙</summary><p>독립군 측은 독립군·한국인 의사·한국인입니다. 친일파는 밀정 측이며 밀정의 신원은 첫날 밤 본인에게만 표시됩니다. 밀정에게 친일파의 신원을 알려 주지는 않습니다. 친일파는 조사 시 밀정이 아닌 것으로 표시됩니다.</p><p>각 밤 행동 시간은 해당 역할이 탈락했더라도 동일하게 유지됩니다. 첫날 친일파 확인은 자동으로 표시되며 별도 버튼을 누를 필요가 없습니다. 의사는 자신도 보호할 수 있습니다. 독립군의 조사 결과는 아침에 본인에게만 표시됩니다.</p><p>투표는 기권이 없으며 자기 자신에게도 투표할 수 있습니다. 미참여 표는 집계에서 제외합니다. 아무도 투표하지 않으면 같은 후보로 재투표합니다. 동점이 반복되면 승자가 나올 때까지 재투표합니다. 오지목·밤 탈락자의 역할은 게임 종료 때 공개합니다.</p><p>대기실·비밀·탈락자 채팅을 포함한 모든 채팅이 서버에서 차단됩니다. 시스템 안내만 표시합니다. 연습 봇은 무작위로 행동하며 추론 AI가 아닙니다. 같은 탭에서 새로고침하면 재접속할 수 있고 서버 재시작 시 진행 상태는 사라집니다.</p></details><button class="button primary full close-dialog">좋아요, 시작할게요 <span>→</span></button></dialog>
+</body></html>

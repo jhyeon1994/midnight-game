@@ -1,0 +1,4 @@
+PASS: Chromium desktop/mobile; six independent browser participants.
+Five role cards, guide, role assignment fixture, lobby, fixed 300-second setting, no chat UI, actual reveal timer, traitor-only identity, reload/reconnect, first-night detective investigation, five-minute countdown, no early vote UI, tie/revote candidates, wrong identification elimination, sequential second night, protection, final victory, bot practice.
+Subsequent phase transitions manually advanced for test speed; full 300-second scheduling covered separately by Node mock timer test.
+No JavaScript/CSP errors; no mobile horizontal overflow.
