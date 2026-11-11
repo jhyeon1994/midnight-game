@@ -32,12 +32,12 @@ io.on('connection',socket=>{
   handle('join',d=>{requireNoRoom();const r=rooms.get(String(d.code||'').toUpperCase());if(!r)throw Error('방을 찾을 수 없습니다. 초대 코드를 확인해 주세요.');const p=r.add(cleanName(d.name));r.system(`${p.name} 님이 입장했습니다.`);return attach(r,p);});
   handle('resume',d=>{
     requireNoRoom();const r=rooms.get(String(d.code||''));const p=r?.players.find(x=>x.token===d.token&&!x.bot);if(!p)throw Error('저장된 방이 만료되었습니다. 새로 입장해 주세요.');
-    if(p.socketId&&p.socketId!==socket.id){const old=io.sockets.sockets.get(p.socketId);if(old){old.emit('replaced');old.data={};old.disconnect(true);}}
+    if(p.socketId&&p.socketId!==socket.id){r.dayVoteAgreements.delete(p.id);const old=io.sockets.sockets.get(p.socketId);if(old){old.emit('replaced');old.data={};old.disconnect(true);}}
     return attach(r,p);
   });
   handle('ready',()=>{const[r,p]=current();if(r.phase!=='lobby')throw Error('대기실에서만 준비할 수 있습니다.');p.ready=!p.ready;r.changed();});
   handle('settings',d=>{const[r]=host();if(r.phase!=='lobby')throw Error('게임 중에는 설정할 수 없습니다.');
-    if(d.daySeconds!==undefined&&d.daySeconds!==300)throw Error('낮 토론은 300초(5분)로 고정됩니다.');
+    if(d.daySeconds!==undefined&&d.daySeconds!==300)throw Error('낮 토론의 최대 시간은 300초(5분)입니다.');
     for(const k of ['nightSeconds','voteSeconds'])if(d[k]!==undefined&&!([15,30,45,60].includes(d[k])))throw Error('지원하지 않는 시간 설정입니다.');
     for(const k of ['nightSeconds','voteSeconds'])if(d[k]!==undefined)r.settings[k]=d[k];r.settings.daySeconds=300;r.changed();});
   handle('addBot',()=>{const[r]=host();const names=['안개','루나','도일','레오','노아','이브','시온','로이','제인','테오','에덴'];const name=names.find(n=>!r.players.some(p=>p.name===`${n} BOT`));r.add(`${name||'연습'} BOT`,true);});
@@ -45,12 +45,13 @@ io.on('connection',socket=>{
   handle('removeOffline',d=>{const[r]=host();if(r.phase!=='lobby')throw Error('대기실에서만 정리할 수 있습니다.');r.players=r.players.filter(p=>!(p.id===d.id&&!p.connected&&!p.bot));r.changed();});
   handle('start',()=>{const[r]=host();r.start();});
   handle('action',d=>{const[r,p]=current();r.action(p,d.target);});
-  handle('voteNow',()=>{current();throw Error('낮 토론은 5분이 지나야 투표로 넘어갑니다.');});
+  handle('dayVoteAgreement',d=>{const[r,p]=current();r.dayVoteAgreement(p,d);});
+  handle('voteNow',()=>{current();throw Error('투표 시작 동의 버튼을 이용해 주세요. 생존한 사람 전원의 동의가 필요합니다.');});
   handle('reset',()=>{const[r]=host();r.reset();});
   handle('chat',()=>{throw Error('모든 채팅이 비활성화되어 있습니다.');});
-  handle('leave',()=>{const[r,p]=current();socket.data={};p.connected=false;p.socketId=null;if(r.phase==='lobby')r.players=r.players.filter(x=>x!==p);if(r.hostId===p.id)r.hostId=r.players.find(x=>x.connected&&!x.bot)?.id||null;r.changed();});
+  handle('leave',()=>{const[r,p]=current();socket.data={};r.disconnectPlayer(p);if(r.phase==='lobby')r.players=r.players.filter(x=>x!==p);if(r.hostId===p.id)r.hostId=r.players.find(x=>x.connected&&!x.bot)?.id||null;r.changed();});
   socket.on('disconnect',()=>{
-    try{const[r,p]=current();p.connected=false;p.socketId=null;
+    try{const[r,p]=current();r.disconnectPlayer(p);
       if(r.hostId===p.id){const next=r.players.find(x=>x.connected&&!x.bot);if(next){r.hostId=next.id;next.ready=true;}}
       r.changed();
     }catch{}

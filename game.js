@@ -13,6 +13,7 @@ function plurality(values){const w=leaders(values);return w.length===1?w[0]:null
 class GameRoom {
   constructor(code,onChange=()=>{}) {
     this.code=code; this.onChange=onChange; this.players=[]; this.hostId=null;
+    this.dayVoteAgreements=new Set();this.discussionId=null;this.phaseVersion=0;
     this.phase='lobby'; this.day=0; this.deadline=null; this.messages=[]; this.actions={};
     this.nightStep=null;this.voteCandidates=[];this.voteRound=0;this.processingBots=false;
     this.settings={daySeconds:300,nightSeconds:30,voteSeconds:30}; this.winner=null;
@@ -31,8 +32,11 @@ class GameRoom {
   message(m){if(m.channel!=='system')return;this.messages.push({id:randomUUID(),time:Date.now(),...m});if(this.messages.length>250)this.messages.shift();}
   alive(){return this.players.filter(p=>p.alive);}
   setPhase(phase,seconds){
-    clearTimeout(this.timer); this.phase=phase;this.deadline=seconds?Date.now()+seconds*1000:null;
-    if(seconds)this.timer=setTimeout(()=>this.advance(),seconds*1000);
+    clearTimeout(this.timer);const version=++this.phaseVersion;
+    this.dayVoteAgreements.clear();this.discussionId=phase==='day'?randomUUID():null;
+    this.phase=phase;this.deadline=seconds?Date.now()+seconds*1000:null;
+    // Ignore a superseded phase's timeout, even if it was already queued.
+    if(seconds)this.timer=setTimeout(()=>{if(this.phaseVersion===version)this.advance();},seconds*1000);
     this.changed();
   }
   start(){
@@ -80,9 +84,26 @@ class GameRoom {
       else this.system('아침이 밝았습니다. 지난밤에는 아무도 탈락하지 않았습니다.');
     }else this.system('첫날 아침입니다. 첫날 밤에는 공격과 보호가 없습니다.');
     this.actions={};this.nightStep=null;
-    if(!this.victory()){this.system('낮 토론은 5분입니다. 시간이 끝나면 자동으로 투표가 시작됩니다. 채팅은 사용할 수 없습니다.');this.setPhase('day',300);}
+    if(!this.victory()){this.system('낮 토론은 최대 5분입니다. 생존한 사람 플레이어 전원이 동의하면 즉시 투표를 시작합니다. 연습 봇과 탈락자는 동의 대상에서 제외됩니다. 시간이 끝나도 자동으로 투표가 시작됩니다. 채팅은 사용할 수 없습니다.');this.setPhase('day',300);}
+  }
+  dayVoteAgreement(p,{agree,day,discussionId}={}){
+    if(!this.players.includes(p)||p.bot||!p.alive||!p.connected)throw Error('접속 중인 생존한 사람 플레이어만 동의할 수 있습니다.');
+    if(this.phase!=='day')throw Error('낮 토론 중에만 투표 시작에 동의할 수 있습니다.');
+    if(day!==this.day||discussionId!==this.discussionId)throw Error('지난 토론의 요청입니다. 현재 화면에서 다시 시도해 주세요.');
+    if(typeof agree!=='boolean')throw Error('동의 여부를 확인해 주세요.');
+    if(agree)this.dayVoteAgreements.add(p.id);else this.dayVoteAgreements.delete(p.id);
+    const eligible=this.alive().filter(x=>!x.bot);
+    if(eligible.length&&eligible.every(x=>x.connected&&this.dayVoteAgreements.has(x.id))){
+      this.system('생존한 사람 플레이어 전원이 동의하여 토론을 마칩니다. 투표를 시작합니다.');
+      this.beginVote();
+    }else this.changed();
+  }
+  disconnectPlayer(p){
+    // Disconnected humans still count toward unanimity, but lose prior agreement.
+    this.dayVoteAgreements.delete(p.id);p.connected=false;p.socketId=null;
   }
   beginVote(candidates=this.alive().map(p=>p.id),revote=false){
+    if(revote?this.phase!=='vote':this.phase!=='day')return;
     this.actions={};this.voteCandidates=candidates;this.voteRound=revote?this.voteRound+1:1;
     this.system(revote?'동점 또는 투표 없음입니다. 지정된 후보들만 대상으로 재투표합니다.':'투표 시간입니다. 밀정으로 의심되는 한 명을 지목해 주세요. 기권은 없습니다.');
     this.setPhase('vote',this.settings.voteSeconds);this.botActions();
@@ -136,14 +157,17 @@ class GameRoom {
   }
   reset(){
     if(this.phase!=='ended')throw Error('게임 종료 후에만 대기실로 돌아갈 수 있습니다.');
-    clearTimeout(this.timer);this.phase='lobby';this.deadline=null;this.actions={};this.winner=null;this.day=0;
+    clearTimeout(this.timer);this.phaseVersion++;this.dayVoteAgreements.clear();this.discussionId=null;this.phase='lobby';this.deadline=null;this.actions={};this.winner=null;this.day=0;
     this.nightStep=null;this.voteCandidates=[];this.voteRound=0;
     this.players=this.players.filter(p=>p.connected||p.bot);
     this.players.forEach(p=>{p.role=null;p.alive=true;p.ready=p.bot||p.id===this.hostId;p.notes=[];p.knownMafia=null;});
     this.messages=[];this.system('새 게임을 준비합니다.');this.changed();
   }
   stateFor(me){
+    const eligible=this.phase==='day'?this.alive().filter(p=>!p.bot):[];
+    const agreedIds=eligible.filter(p=>p.connected&&this.dayVoteAgreements.has(p.id)).map(p=>p.id);
     return {
+      dayVoteAgreement:{discussionId:this.discussionId,total:eligible.length,agreed:agreedIds.length,agreedIds,offline:eligible.filter(p=>!p.connected).length},
       code:this.code,hostId:this.hostId,phase:this.phase,day:this.day,nightStep:this.nightStep,voteCandidates:this.voteCandidates,voteRound:this.voteRound,deadline:this.deadline,serverTime:Date.now(),settings:{...this.settings,daySeconds:300},winner:this.winner,
       players:this.players.map(p=>({id:p.id,name:p.name,bot:p.bot,connected:p.connected,ready:p.ready,alive:p.alive,...(this.phase==='ended'?{role:p.role}:{})})),
       me:{id:me.id,role:me.role,alive:me.alive,notes:me.notes,chosen:this.actions[me.id]||null,teammates:me.role==='traitor'&&me.knownMafia?[me.knownMafia]:[]},
@@ -151,6 +175,6 @@ class GameRoom {
       messages:this.messages.filter(m=>m.channel==='system')
     };
   }
-  destroy(){clearTimeout(this.timer);}
+  destroy(){clearTimeout(this.timer);this.phaseVersion++;this.dayVoteAgreements.clear();this.discussionId=null;}
 }
 module.exports={GameRoom,ROLE_NAMES,plurality};
